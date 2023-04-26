@@ -1,0 +1,13 @@
+checkpoint/
+imgs/
+data/
+datasets/
+imgs/
+.idea/
+precomputed/
+pretrained/
+__pycache__/
+runs/
+wandb/
+a.zip
+
