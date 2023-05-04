@@ -7,6 +7,10 @@ import yaml
 from PIL import Image
 import warnings
 from IPython.display import display
+from utils.utils import set_random_seed
+
+import torch
+import numpy as np
 
 warnings.filterwarnings(action='ignore')
 
@@ -50,6 +54,7 @@ def gen_all_face_images(model_name, t_0, n_iter):
         'model_ratio': degree_of_change,
         'edit_attr': None, 'src_txts': None, 'trg_txts': None,
         'name_of_freeze_function': None,
+        'seed': 3407,
     }
     args = dict2namespace(args_dic)
 
@@ -59,6 +64,9 @@ def gen_all_face_images(model_name, t_0, n_iter):
     config.device = device
 
     # Edit
+    set_random_seed(args.seed)
+
+
     runner = DiffusionCLIP(args, config)
     n_result = 1
     img_orig = Image.open(os.path.join(exp_dir, '0_orig.png'))
@@ -76,7 +84,7 @@ def gen_all_face_images(model_name, t_0, n_iter):
             grid.paste(img, (int(img.height * (i + 1)), 0))
 
         grid.show()
-        display(grid)
+        # display(grid)
         print('ITER =', j + 1)
 
         if j != -1:

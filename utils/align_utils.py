@@ -38,7 +38,7 @@ def run_alignment(image_path, output_size):
         print('Done.')
     predictor = dlib.shape_predictor("pretrained/shape_predictor_68_face_landmarks.dat")
     aligned_image = align_face(filepath=image_path, predictor=predictor, output_size=output_size, transform_size=output_size)
-    print("Aligned image has shape: {}".format(aligned_image.size))
+    # print("Aligned image has shape: {}".format(aligned_image.size))
     return aligned_image
 
 

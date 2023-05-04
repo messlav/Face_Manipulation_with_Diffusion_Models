@@ -21,7 +21,8 @@ class WanDBWriter:
         # )
         wandb.init(
             project=config['wandb_project'],
-            config=config
+            config=config,
+            name=config['wandb_run_name'],
         )
         self.wandb = wandb
 

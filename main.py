@@ -9,6 +9,7 @@ import torch
 import numpy as np
 
 from diffusionclip import DiffusionCLIP
+from utils.utils import set_random_seed
 from configs.paths_config import HYBRID_MODEL_PATHS
 
 
@@ -86,6 +87,8 @@ def parse_args_and_config():
     parser.add_argument('--wandb', type=int, default=0, help='Whether to use wandb log')
     parser.add_argument('--wandb_project', type=str, default='Face Manipulation with Diffusion Models',
                         help='name of the wandb project')
+    parser.add_argument('--wandb_run_name', type=str, default=None, help='name of the wandb run')
+    parser.add_argument('--wandb_test_my_image', type=bool, default=False, help='whether to run all models on my image')
     parser.add_argument('--wandb_num_imgs_train', type=int, default=0, help='Num of train images to log in wandb')
     parser.add_argument('--wandb_num_imgs_test', type=int, default=0, help='Num of test images to log in wandb')
 
@@ -151,13 +154,7 @@ def parse_args_and_config():
     logging.info("Using device: {}".format(device))
     new_config.device = device
 
-    # set random seed
-    torch.manual_seed(args.seed)
-    np.random.seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
-
-    torch.backends.cudnn.benchmark = True
+    set_random_seed(args.seed)
 
     return args, new_config
 
