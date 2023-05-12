@@ -83,6 +83,11 @@ def parse_args_and_config():
     parser.add_argument('--scheduler', type=int, default=1, help='Whether to increase the learning rate')
     parser.add_argument('--sch_gamma', type=float, default=1.3, help='Scheduler gamma')
 
+    # LoRA
+    parser.add_argument('--lora', type=int, default=0, help='Whether to use LoRA')
+    parser.add_argument('--lora_rank', type=int, default=8, help='rank for all layers for LoRA')
+    parser.add_argument('--lora_alpha', type=int, default=1, help='alpha (scaling) for all layers for LoRA')
+
     # wandb logging
     parser.add_argument('--wandb', type=int, default=0, help='Whether to use wandb log')
     parser.add_argument('--wandb_project', type=str, default='Face Manipulation with Diffusion Models',
