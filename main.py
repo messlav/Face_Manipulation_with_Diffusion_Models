@@ -1,4 +1,3 @@
-import time
 import argparse
 import traceback
 import logging
@@ -6,11 +5,9 @@ import yaml
 import sys
 import os
 import torch
-import numpy as np
 
 from diffusionclip import DiffusionCLIP
 from utils.utils import set_random_seed
-from configs.paths_config import HYBRID_MODEL_PATHS
 
 
 def parse_args_and_config():

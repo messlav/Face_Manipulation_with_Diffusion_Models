@@ -8,12 +8,10 @@ class _LogIt(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor, msg: str) -> torch.Tensor:
         ctx.msg = msg
-        # print("forward", msg)
         return x
 
     @staticmethod
     def backward(ctx, grad_fx: torch.Tensor) -> torch.Tensor:
-        # print("backward", ctx.msg)
         return grad_fx, None
 
 
@@ -56,11 +54,6 @@ class Upsample(nn.Module):
         super().__init__()
         self.with_conv = with_conv
         if self.with_conv:
-            # self.conv = torch.nn.Conv2d(in_channels,
-            #                             in_channels,
-            #                             kernel_size=3,
-            #                             stride=1,
-            #                             padding=1)
             self.conv = lora.Conv2d(in_channels,
                                     in_channels,
                                     kernel_size=3,
@@ -82,12 +75,6 @@ class Downsample(nn.Module):
         super().__init__()
         self.with_conv = with_conv
         if self.with_conv:
-            # no asymmetric padding in torch conv, must do it ourselves
-            # self.conv = torch.nn.Conv2d(in_channels,
-            #                             in_channels,
-            #                             kernel_size=3,
-            #                             stride=2,
-            #                             padding=0)
             self.conv = lora.Conv2d(in_channels,
                                     in_channels,
                                     kernel_size=3,
@@ -116,11 +103,6 @@ class ResnetBlock(nn.Module):
         self.use_conv_shortcut = conv_shortcut
 
         self.norm1 = Normalize(in_channels)
-        # self.conv1 = torch.nn.Conv2d(in_channels,
-        #                              out_channels,
-        #                              kernel_size=3,
-        #                              stride=1,
-        #                              padding=1)
         self.conv1 = lora.Conv2d(in_channels,
                                  out_channels,
                                  kernel_size=3,
@@ -128,17 +110,10 @@ class ResnetBlock(nn.Module):
                                  padding=1,
                                  r=r,
                                  lora_alpha=lora_alpha)
-        # self.temb_proj = torch.nn.Linear(temb_channels,
-        #                                  out_channels)
         self.temb_proj = lora.Linear(temb_channels,
                                      out_channels, r=r)
         self.norm2 = Normalize(out_channels)
         self.dropout = torch.nn.Dropout(dropout)
-        # self.conv2 = torch.nn.Conv2d(out_channels,
-        #                              out_channels,
-        #                              kernel_size=3,
-        #                              stride=1,
-        #                              padding=1)
         self.conv2 = lora.Conv2d(out_channels,
                                  out_channels,
                                  kernel_size=3,
@@ -148,11 +123,6 @@ class ResnetBlock(nn.Module):
                                  lora_alpha=lora_alpha)
         if self.in_channels != self.out_channels:
             if self.use_conv_shortcut:
-                # self.conv_shortcut = torch.nn.Conv2d(in_channels,
-                #                                      out_channels,
-                #                                      kernel_size=3,
-                #                                      stride=1,
-                #                                      padding=1)
                 self.conv_shortcut = lora.Conv2d(in_channels,
                                                  out_channels,
                                                  kernel_size=3,
@@ -161,11 +131,6 @@ class ResnetBlock(nn.Module):
                                                  r=r,
                                                  lora_alpha=lora_alpha)
             else:
-                # self.nin_shortcut = torch.nn.Conv2d(in_channels,
-                #                                     out_channels,
-                #                                     kernel_size=1,
-                #                                     stride=1,
-                #                                     padding=0)
                 self.nin_shortcut = lora.Conv2d(in_channels,
                                                 out_channels,
                                                 kernel_size=1,
@@ -207,11 +172,6 @@ class AttnBlock(nn.Module):
         self.in_channels = in_channels
 
         self.norm = Normalize(in_channels)
-        # self.q = torch.nn.Conv2d(in_channels,
-        #                          in_channels,
-        #                          kernel_size=1,
-        #                          stride=1,
-        #                          padding=0)
         self.q = lora.Conv2d(in_channels,
                              in_channels,
                              kernel_size=1,
@@ -219,11 +179,6 @@ class AttnBlock(nn.Module):
                              padding=0,
                              r=r,
                              lora_alpha=lora_alpha)
-        # self.k = torch.nn.Conv2d(in_channels,
-        #                          in_channels,
-        #                          kernel_size=1,
-        #                          stride=1,
-        #                          padding=0)
         self.k = lora.Conv2d(in_channels,
                              in_channels,
                              kernel_size=1,
@@ -231,11 +186,6 @@ class AttnBlock(nn.Module):
                              padding=0,
                              r=r,
                              lora_alpha=lora_alpha)
-        # self.v = torch.nn.Conv2d(in_channels,
-        #                          in_channels,
-        #                          kernel_size=1,
-        #                          stride=1,
-        #                          padding=0)
         self.v = lora.Conv2d(in_channels,
                              in_channels,
                              kernel_size=1,
@@ -243,11 +193,6 @@ class AttnBlock(nn.Module):
                              padding=0,
                              r=r,
                              lora_alpha=lora_alpha)
-        # self.proj_out = torch.nn.Conv2d(in_channels,
-        #                                 in_channels,
-        #                                 kernel_size=1,
-        #                                 stride=1,
-        #                                 padding=0)
         self.proj_out = lora.Conv2d(in_channels,
                                     in_channels,
                                     kernel_size=1,
@@ -295,7 +240,6 @@ class DDPM_lora(nn.Module):
         in_channels = config.model.in_channels
         resolution = config.data.image_size
         resamp_with_conv = config.model.resamp_with_conv
-        # r = config.lora_rank
 
         self.ch = ch
         self.temb_ch = self.ch * 4
@@ -306,12 +250,6 @@ class DDPM_lora(nn.Module):
 
         # timestep embedding
         self.temb = nn.Module()
-        # self.temb.dense = nn.ModuleList([
-        #     torch.nn.Linear(self.ch,
-        #                     self.temb_ch),
-        #     torch.nn.Linear(self.temb_ch,
-        #                     self.temb_ch),
-        # ])
         self.temb.dense = nn.ModuleList([
             lora.Linear(self.ch,
                         self.temb_ch, r=r, lora_alpha=lora_alpha),
@@ -319,11 +257,6 @@ class DDPM_lora(nn.Module):
                         self.temb_ch, r=r, lora_alpha=lora_alpha),
         ])
         # downsampling
-        # self.conv_in = torch.nn.Conv2d(in_channels,
-        #                                self.ch,
-        #                                kernel_size=3,
-        #                                stride=1,
-        #                                padding=1)
         self.conv_in = lora.Conv2d(in_channels,
                                    self.ch,
                                    kernel_size=3,
@@ -404,11 +337,6 @@ class DDPM_lora(nn.Module):
 
         # end
         self.norm_out = Normalize(block_in)
-        # self.conv_out = torch.nn.Conv2d(block_in,
-        #                                 out_ch,
-        #                                 kernel_size=3,
-        #                                 stride=1,
-        #                                 padding=1)
         self.conv_out = lora.Conv2d(block_in,
                                     out_ch,
                                     kernel_size=3,

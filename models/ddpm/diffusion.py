@@ -7,12 +7,10 @@ class _LogIt(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor, msg: str) -> torch.Tensor:
         ctx.msg = msg
-        #print("forward", msg)
         return x
     
     @staticmethod
     def backward(ctx, grad_fx: torch.Tensor) -> torch.Tensor:
-        #print("backward", ctx.msg)
         return grad_fx, None
     
 def log_bwd(x, msg: str):

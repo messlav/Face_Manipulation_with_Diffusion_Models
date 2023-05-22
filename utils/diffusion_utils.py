@@ -6,7 +6,6 @@ class _LogIt(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x: torch.Tensor, msg: str) -> torch.Tensor:
         ctx.msg = msg
-        # print("forward", msg)
         return x
     
     @staticmethod
